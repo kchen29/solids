@@ -38,6 +38,7 @@
             Theta is in degrees
           
 	 display: draw the lines of the edge matrix to the screen, then display the screen
+         clear: clears the screen
 	 save: draw the lines of the edge matrix to the screen
 	    save the screen to a file -
 	    takes 1 argument (filename)
@@ -53,6 +54,7 @@
   "Parses LINE according to parse-file."
   (switch line #'string=
     ("display" (display t))
+    ("clear" (clear-screen))
     ("push" (setf (cdr stack) (cons (copy-matrix (car stack)) (cdr stack))))
     ("pop" (setf (car stack) (cadr stack)
                  (cdr stack) (cddr stack)))
@@ -97,8 +99,8 @@
 (defun valid-command (line)
   "Returns t if line is a valid command. Nil otherwise."
   (member line
-          '("pop" "push" "line" "circle" "hermite" "bezier" "box"
-            "sphere" "torus" "scale" "move" "rotate" "display" "save")
+          '("pop" "push" "line" "circle" "hermite" "bezier" "box" "sphere"
+            "torus" "scale" "move" "rotate" "display" "clear" "save")
           :test #'string=))
 
 (defun next-line (stream)
