@@ -69,7 +69,7 @@
            (clear-matrix edges))
          (post-add-polygons ()
            (matrix-multiply (car stack) polygons)
-           (draw-polygons polygons '(255 0 255))
+           (draw-polygons polygons)
            (clear-matrix polygons))
          (update-current-stack (transform)
            (setf (car stack) (matrix-multiply (car stack) transform))))
