@@ -2,7 +2,9 @@
 
 ;;matrix struct definition
 (defstruct (matrix (:conc-name m-)
-                   (:constructor m-matrix))
+                   (:constructor m-matrix)
+                   (:copier m-copy-matrix)
+                   (:print-object print-matrix))
   rows
   cols
   ;;last-col is how many columns there are
@@ -18,6 +20,17 @@
   (m-matrix :rows rows :cols cols :last-col last-col
             :array (make-array (list rows cols) :adjustable t)))
 
+(defun copy-matrix (matrix)
+  "Copies a matrix."
+  (let ((copy (m-copy-matrix matrix)))
+    (setf (m-array copy) (copy-array (m-array copy)))
+    copy))
+
+(defun copy-array (array)
+  "Copies an array."
+  (let ((dims (array-dimensions array)))
+    (adjust-array (make-array dims :displaced-to array) dims)))
+
 ;;other matrix functions
 (defun adjust-matrix (matrix rows cols)
   "Adjusts MATRIX to ROWS and COLS.
@@ -31,9 +44,9 @@
   (adjust-matrix matrix 4 4)
   (setf (m-last-col matrix) 0))
 
-(defun print-matrix (matrix)
-  "Prints out MATRIX to *standard-output*."
-  (format t "~{~%~{~a~4,4T~}~}~%" (matrix-to-list matrix)))
+(defun print-matrix (matrix stream)
+  "Prints out MATRIX to STREAM."
+  (format stream "~{~%~{~a~4,4T~}~}~%" (matrix-to-list matrix)))
 
 (defun matrix-to-list (matrix)
   "Turns MATRIX into a list."
@@ -53,14 +66,15 @@
 
 (defun matrix-multiply (m1 m2)
   "A specific matrix multiplication routine. M1 is square.
-   Multiplies M1 with M2. Modifies M2 to hold the result."
+   Multiplies M1 with M2. Modifies M2 to hold the result. Returns M2."
   (let* ((dimension (m-rows m1))
          (temp (make-array dimension)))
     (dotimes (col (m-last-col m2))
       (dotimes (i dimension)
         (setf (svref temp i) (mref m2 i col)))
       (dotimes (row dimension)
-        (setf (mref m2 row col) (dot row m1 temp))))))
+        (setf (mref m2 row col) (dot row m1 temp)))))
+  m2)
 
 (defun dot (row m1 temp)
   "Dots the ROW of M1 with TEMP.
@@ -125,10 +139,14 @@
 (defrotation x 1 2)
 (defrotation y 2 0)
 
+(defun make-rotate (axis degrees)
+  "Makes a matrix that rotates by DEGREES counter-clockwise using AXIS."
+  (case axis
+    (x (make-rotate-x degrees))
+    (y (make-rotate-y degrees))
+    (z (make-rotate-z degrees))
+    (otherwise (format t "Unknown axis: ~a~%" axis))))
+
 (defun rotate (matrix axis degrees)
   "Rotate MATRIX by the rotation matrix with AXIS by DEGREES."
-  (case axis
-    (x (rotate-x matrix degrees))
-    (y (rotate-y matrix degrees))
-    (z (rotate-z matrix degrees))
-    (otherwise (format t "Unknown axis: ~a~%" axis))))
+  (matrix-multiply (make-rotate axis degrees) matrix))

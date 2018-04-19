@@ -1,8 +1,8 @@
 ;;;; Parse a script.
 
 (defun parse-file (filename edges polygons stack)
-  "Parses FILENAME. Uses EDGES and TRANSFORM matrices to store edges
-   and the transform matrix. Commands write to *SCREEN*.
+  "Parses FILENAME. Uses EDGES and POLYGONS matrices to store edges
+   and polygons. STACK is the stack of coordinate systems. Commands write to *SCREEN*.
    The file follows the following format:
      Every command is a single string that takes up a line
      Any command that requires arguments must have those arguments in the second line.
@@ -26,7 +26,6 @@
             radius1 is the radius of the cross-section circles
             radius2 is the radius of the center of those circles rotated around the center by
 
-	 ident: set the transform matrix to the identity matrix
 	 scale: create a scale matrix,
 	    then multiply the transform matrix by the scale matrix -
 	    takes 3 arguments (sx sy sz)
@@ -37,13 +36,11 @@
 	    then multiply the transform matrix by the rotation matrix -
 	    takes 2 arguments (axis theta) axis should be x, y or z.
             Theta is in degrees
-	 apply: apply the current transformation matrix to the edge matrix
           
 	 display: draw the lines of the edge matrix to the screen, then display the screen
 	 save: draw the lines of the edge matrix to the screen
 	    save the screen to a file -
 	    takes 1 argument (filename)
-         clear: clears the edge matrix of all points
 	 quit: end parsing."
   (with-open-file (stream filename)
     (do ((line (next-line stream) (next-line stream)))
@@ -53,57 +50,55 @@
           (format t "Unknown command: ~a~%" line)))))
 
 (defun parse-line (line stream edges polygons stack)
-  "Parses line according to parse-file."
+  "Parses LINE according to parse-file."
   (switch line #'string=
-    ("display" (display t)
-               (clear-screen))
-    ("push" (push (copy-matrix (caar stack)) (car stack)))
-    ("pop" (pop (car stack)))
+    ("display" (display t))
+    ("push" (setf (cdr stack) (cons (copy-matrix (car stack)) (cdr stack))))
+    ("pop" (setf (car stack) (cadr stack)
+                 (cdr stack) (cddr stack)))
     (otherwise
-     (let ((args (parse-args (next-line stream))))
-       (switch line #'string=
-         ("line" (apply #'add-edge edges args)
-                 (matrix-multiply (caar stack) edges)
-                 (draw-lines edges '(255 0 255))
-                 (clear-matrix edges))
-         ("circle" (apply #'add-circle edges .01 args)
-                   (matrix-multiply (caar stack) edges)
-                   (draw-lines edges '(255 0 255))
-                   (clear-matrix edges))
-         ("hermite" (apply #'add-hermite edges .01 args)
-                    (matrix-multiply (caar stack) edges)
-                    (draw-lines edges '(255 0 255))
-                    (clear-matrix edges))
-         ("bezier" (apply #'add-bezier edges .01 args)
-                   (matrix-multiply (caar stack) edges)
-                   (draw-lines edges '(255 0 255))
-                   (clear-matrix edges))
-         
-         ("box" (apply #'add-box polygons args)
-                (matrix-multiply (caar stack) polygons)
-                (draw-polygons polygons '(255 0 255))
-                (clear-matrix polygons))
-         ("sphere" (apply #'add-sphere polygons 20 args)
-                   (matrix-multiply (caar stack) polygons)
-                   (draw-polygons polygons '(255 0 255))
-                   (clear-matrix polygons))
-         ("torus" (apply #'add-torus polygons 20 args)
-                  (matrix-multiply (caar stack) polygons)
-                  (draw-polygons polygons '(255 0 255))
-                  (clear-matrix polygons))
-         
-         ("scale" (apply #'scale (caar stack) args))
-         ("move" (apply #'translate (caar stack) args))
-         ("rotate" (apply #'rotate (caar stack) args))
-         
-         ("save" (save (string-downcase (symbol-name (first args))))
-                 (clear-screen)))))))
+     (parse-line-args line edges polygons stack (parse-args (next-line stream))))))
+
+(defun parse-line-args (line edges polygons stack args)
+  "Parses LINE with arg commands."
+  (flet ((post-add-lines ()
+           (matrix-multiply (car stack) edges)
+           (draw-lines edges '(255 0 255))
+           (clear-matrix edges))
+         (post-add-polygons ()
+           (matrix-multiply (car stack) polygons)
+           (draw-polygons polygons '(255 0 255))
+           (clear-matrix polygons))
+         (update-current-stack (transform)
+           (setf (car stack) (matrix-multiply (car stack) transform))))
+    (switch line #'string=
+      ("line" (apply #'add-edge edges args)
+              (post-add-lines))
+      ("circle" (apply #'add-circle edges .01 args)
+                (post-add-lines))
+      ("hermite" (apply #'add-hermite edges .01 args)
+                 (post-add-lines))
+      ("bezier" (apply #'add-bezier edges .01 args)
+                (post-add-lines))
+      
+      ("box" (apply #'add-box polygons args)
+             (post-add-polygons))
+      ("sphere" (apply #'add-sphere polygons 20 args)
+                (post-add-polygons))
+      ("torus" (apply #'add-torus polygons 20 args)
+               (post-add-polygons))
+      
+      ("scale" (update-current-stack (apply #'make-scale args)))
+      ("move" (update-current-stack (apply #'make-translate args)))
+      ("rotate" (update-current-stack (apply #'make-rotate args)))
+      
+      ("save" (save (string-downcase (symbol-name (first args))))))))
 
 (defun valid-command (line)
   "Returns t if line is a valid command. Nil otherwise."
   (member line
-          '("pop" "push" "line" "circle" "hermite" "bezier" "box" "sphere" "torus"
-            "scale" "move" "rotate" "display" "save")
+          '("pop" "push" "line" "circle" "hermite" "bezier" "box"
+            "sphere" "torus" "scale" "move" "rotate" "display" "save")
           :test #'string=))
 
 (defun next-line (stream)
