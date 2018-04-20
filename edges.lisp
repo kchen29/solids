@@ -83,18 +83,15 @@
   (add-polygon polygons x0 y0 z0 x1 y1 z1 x2 y2 z2)
   (add-polygon polygons x0 y0 z0 x2 y2 z2 x3 y3 z3))
 
-(defmacro add-quad-helper ()
-  "Helper macro for add-quad-index."
-  (let (forms)
-    (dolist (x '(i j k l))
-      (dotimes (y 3)
-        (push `(mref points ,y ,x) forms)))
-    `(add-quad polygons ,@(nreverse forms))))
-
 (defun add-quad-index (polygons points i j k l)
   "Adds a quadrilateral to POLYGONS, with indices.
    Indices into points."
-  (add-quad-helper))
+  (macrolet-helper
+    (let (forms)
+      (dolist (x '(i j k l))
+        (dotimes (y 3)
+          (push `(mref points ,y ,x) forms)))
+      `(add-quad polygons ,@(nreverse forms)))))
 
 (defun add-box (polygons x y z width height depth)
   "Adds a box to POLYGONS where the front left upper point is (x y z).

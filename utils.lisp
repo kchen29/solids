@@ -47,3 +47,9 @@
                          collect `(rotatef ,x ,y)))
               forms)))
     `(progn ,@(nreverse forms))))
+
+(defmacro macrolet-helper (&body body)
+  "Defines a macrolet with BODY and evaluates it."
+  (let ((temp (gensym)))
+    `(macrolet ((,temp () ,@body))
+       (,temp))))

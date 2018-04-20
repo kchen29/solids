@@ -28,16 +28,14 @@
             (draw-line-base y0 x0 (- y0 ydif) x1 y (- (* 2 y0) x))
             (draw-line-base x0 y0 x1 (- y0 ydif) x (- (* 2 y0) y))))))
 
-(defmacro draw-line-in-helper ()
-  (let (forms)
-    (dotimes (in 2)
-      (dotimes (co 2)
-        (push `(mref edges ,co (+ ,in index)) forms)))
-    `(draw-line ,@(nreverse forms) color)))
-
 (defun draw-line-index (edges index color)
   "Draws the line starting from INDEX in EDGES."
-  (draw-line-in-helper))
+  (macrolet-helper
+    (let (forms)
+      (dotimes (in 2)
+        (dotimes (co 2)
+          (push `(mref edges ,co (+ ,in index)) forms)))
+      `(draw-line ,@(nreverse forms) color))))
 
 (defun draw-lines (edges color)
   "Draws the lines from EDGES to *SCREEN* with COLOR."
@@ -56,16 +54,14 @@
     (draw-line x1 y1 x2 y2 color)
     (scanline x0 y0 x1 y1 x2 y2 color)))
 
-(defmacro draw-polygon-in-helper ()
-  (let (forms)
-    (dotimes (in 3)
-      (dotimes (co 2)
-        (push `(mref polygons ,co (+ ,in index)) forms)))
-    `(draw-polygon ,@(nreverse forms))))
-
 (defun draw-polygon-index (polygons index)
   "Draws the polygon starting from INDEX in POLYGONS"
-  (draw-polygon-in-helper))
+  (macrolet-helper
+    (let (forms)
+      (dotimes (in 3)
+        (dotimes (co 2)
+          (push `(mref polygons ,co (+ ,in index)) forms)))
+      `(draw-polygon ,@(nreverse forms)))))
 
 (defun draw-polygons (polygons)
   "Draws the polygons from POLYGONS to *SCREEN*."
