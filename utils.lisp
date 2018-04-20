@@ -29,6 +29,21 @@
 
 (defmacro roundify (&rest args)
   "Rounds each symbol."
-  (cons 'setf (loop for arg in args
-                    collect arg
-                    collect `(round ,arg))))
+  `(setf ,@(loop for arg in args
+                 collect arg
+                 collect `(round ,arg))))
+
+(defmacro sortify (index &rest cases)
+  "Sorts each case via when and rotate. Checks the symbol at INDEX.
+   Has the first case be least, and last case be greatest."
+  (let (forms)
+    (do* ((case-move cases (cdr case-move))
+          (case1 (car cases) (car case-move)))
+         ((not case-move))
+      (dolist (case2 (cdr case-move))
+        (push `(when (> ,(nth index case1) ,(nth index case2))
+                 ,@(loop for x in case1
+                         for y in case2
+                         collect `(rotatef ,x ,y)))
+              forms)))
+    `(progn ,@(nreverse forms))))

@@ -17,9 +17,7 @@
 
 (defun draw-line (x0 y0 x1 y1 color)
   "Draws a line from (x0, y0) to (x1, y1) on *SCREEN* using COLOR."
-  (when (minusp (- x1 x0))
-    (rotatef x0 x1)
-    (rotatef y0 y1))
+  (sortify 0 (x0 y0) (x1 y1))
   (let ((xdif (- x1 x0))
         (ydif (- y1 y0)))
     (if (>= ydif 0)
@@ -92,18 +90,11 @@
               (* (svref temp2 0)
                  (svref temp1 1))))))
 
-(defmacro sortify ((a b) (c d))
-  `(when (> ,b ,d)
-     (rotatef ,b ,d)
-     (rotatef ,a ,c)))
-
 (defun scanline (x0 y0 x1 y1 x2 y2 color)
   "Does scanline conversion."
   (roundify y0 y1 y2)
   ;;have y0 be the bottom, y1 the middle, and y2 the top
-  (sortify (x0 y0) (x1 y1))
-  (sortify (x0 y0) (x2 y2))
-  (sortify (x1 y1) (x2 y2))
+  (sortify 1 (x0 y0) (x1 y1) (x2 y2))
   (do ((y y0 (1+ y))
        (a x0 (+ a (/ (- x2 x0) (- y2 y0))))
        (b x0)
