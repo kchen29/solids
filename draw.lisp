@@ -30,39 +30,56 @@
             (draw-line-base y0 x0 (- y0 ydif) x1 y (- (* 2 y0) x))
             (draw-line-base x0 y0 x1 (- y0 ydif) x (- (* 2 y0) y))))))
 
+(defmacro draw-line-in-helper ()
+  (let (forms)
+    (dotimes (in 2)
+      (dotimes (co 2)
+        (push `(mref edges ,co (+ ,in index)) forms)))
+    `(draw-line ,@(nreverse forms) color)))
+
+(defun draw-line-index (edges index color)
+  "Draws the line starting from INDEX in EDGES."
+  (draw-line-in-helper))
+
 (defun draw-lines (edges color)
   "Draws the lines from EDGES to *SCREEN* with COLOR."
   (do ((index 0 (+ 2 index)))
       ((>= index (m-last-col edges)))
-    (draw-line (mref edges 0 index)
-               (mref edges 1 index)
-               (mref edges 0 (1+ index))
-               (mref edges 1 (1+ index))
-               color)))
+    (draw-line-index edges index color)))
 
 ;;;3d shapes
+(defun draw-polygon (x0 y0 x1 y1 x2 y2)
+  "Draws the polygon to *SCREEN*."
+  (let ((color (mapcar (lambda (x y) (mod (round (* x y)) 256))
+                       (list x0 x1 x2)
+                       (list y0 y1 y2))))
+    (draw-line x0 y0 x1 y1 color)
+    (draw-line x0 y0 x2 y2 color)
+    (draw-line x1 y1 x2 y2 color)
+    (scanline x0 y0 x1 y1 x2 y2 color)))
+
+(defmacro draw-polygon-in-helper ()
+  (let (forms)
+    (dotimes (in 3)
+      (dotimes (co 2)
+        (push `(mref polygons ,co (+ ,in index)) forms)))
+    `(draw-polygon ,@(nreverse forms))))
+
+(defun draw-polygon-index (polygons index)
+  "Draws the polygon starting from INDEX in POLYGONS"
+  (draw-polygon-in-helper))
+
 (defun draw-polygons (polygons)
   "Draws the polygons from POLYGONS to *SCREEN*."
-  (flet ((get-in (coord index)
-           (mref polygons coord index))
-         (draw-polygon (x0 y0 x1 y1 x2 y2)
-           (let ((color (mapcar (lambda (s) (mod (round s) 256))
-                                (list (* x0 y0) (* x1 y1) (* x2 y2)))))
-             (draw-line x0 y0 x1 y1 color)
-             (draw-line x0 y0 x2 y2 color)
-             (draw-line x1 y1 x2 y2 color)
-             (scanline x0 y0 x1 y1 x2 y2 color))))
-    (do ((index 0 (+ 3 index)))
-        ((>= index (m-last-col polygons)))
-      (when (forward-facing polygons index)
-        (draw-polygon (get-in 0 index) (get-in 1 index)
-                      (get-in 0 (1+ index)) (get-in 1 (1+ index))
-                      (get-in 0 (+ 2 index)) (get-in 1 (+ 2 index)))))))
+  (do ((index 0 (+ 3 index)))
+      ((>= index (m-last-col polygons)))
+    (when (forward-facing-p polygons index)
+      (draw-polygon-index polygons index))))
 
 ;;closure, for efficiency
 (let ((temp1 (make-array 3))
       (temp2 (make-array 3)))
-  (defun forward-facing (polygons index)
+  (defun forward-facing-p (polygons index)
     "Returns true if the surface in POLYGONS starting 
      at INDEX is forward-facing."
     (dotimes (x 3)
