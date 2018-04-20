@@ -88,19 +88,18 @@
      ,@(loop for arg in args
              collect `(setf ,arg (round ,arg)))))
 
+(defmacro sortify ((a b) (c d))
+  `(when (> ,b ,d)
+     (rotatef ,b ,d)
+     (rotatef ,a ,c)))
+
 (defun scanline (x0 y0 x1 y1 x2 y2 color)
   "Does scanline conversion."
   (roundify y0 y1 y2)
   ;;have y0 be the bottom, y1 the middle, and y2 the top
-  (when (> y0 y1)
-    (rotatef y0 y1)
-    (rotatef x0 x1))
-  (when (> y0 y2)
-    (rotatef y0 y2)
-    (rotatef x0 x2))
-  (when (> y1 y2)
-    (rotatef y1 y2)
-    (rotatef x1 x2))
+  (sortify (x0 y0) (x1 y1))
+  (sortify (x0 y0) (x2 y2))
+  (sortify (x1 y1) (x2 y2))
   (do ((y y0 (1+ y))
        (a x0 (+ a (/ (- x2 x0) (- y2 y0))))
        (b x0)
