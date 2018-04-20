@@ -39,8 +39,7 @@
 
 (defun draw-lines (edges color)
   "Draws the lines from EDGES to *SCREEN* with COLOR."
-  (do ((index 0 (+ 2 index)))
-      ((>= index (m-last-col edges)))
+  (do-step (index (m-last-col edges) 2)
     (draw-line-index edges index color)))
 
 ;;;3d shapes
@@ -65,8 +64,7 @@
 
 (defun draw-polygons (polygons)
   "Draws the polygons from POLYGONS to *SCREEN*."
-  (do ((index 0 (+ 3 index)))
-      ((>= index (m-last-col polygons)))
+  (do-step (index (m-last-col polygons) 3)
     (when (forward-facing-p polygons index)
       (draw-polygon-index polygons index))))
 

@@ -7,6 +7,12 @@
            for ,var = (* ,max (/ ,temp ,step))
            do ,@body)))
 
+(defmacro do-step ((var count step) &body body)
+  "Iterate for VAR from 0 below COUNT with STEP interval."
+  `(do ((,var 0 (+ ,step ,var)))
+       ((>= ,var ,count))
+     ,@body))
+
 (defmacro switch (value test &body cases)
   "Macro for switch-case statements.
    TESTs VALUE with the first element in each case of CASES.
@@ -34,7 +40,7 @@
                  collect `(round ,arg))))
 
 (defmacro sortify (index &rest cases)
-  "Sorts each case via when and rotate. Checks the symbol at INDEX.
+  "Sorts each case via when and rotatef. Checks the symbol at INDEX.
    Has the first case be least, and last case be greatest."
   (let (forms)
     (do* ((case-move cases (cdr case-move))
