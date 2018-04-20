@@ -27,3 +27,8 @@
         for product = 1 then (* x product)
         sum (* coeff product)))
 
+(defmacro roundify (&rest args)
+  "Rounds each symbol."
+  (cons 'setf (loop for arg in args
+                    collect arg
+                    collect `(round ,arg))))

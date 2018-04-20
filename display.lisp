@@ -8,6 +8,13 @@
 
 (defparameter *screen* (make-screen) "A 2D array of colors.")
 
+(defun plot (x y color)
+  "Plots (x, y) on *SCREEN* with COLOR.
+   Rounds x and y. Checks bounds. COLOR is not copied."
+  (roundify x y)
+  (when (and (< -1 x *screen-side*) (< -1 y *screen-side*))
+    (setf (aref *screen* x y) color)))
+
 (defun write-ppm (filename)
   "Writes a ppm, assuming P3 and max color value of 255.
    Writes to FILENAME with *SCREEN*."

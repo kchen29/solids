@@ -1,12 +1,5 @@
 ;;;; Draw to screen.
 
-(defun plot (x y color)
-  "Plots (x, y) on *SCREEN* with COLOR.
-   Rounds x and y. Checks bounds. COLOR is not copied."
-  (setf x (round x) y (round y))
-  (when (and (< -1 x *screen-side*) (< -1 y *screen-side*))
-    (setf (aref *screen* x y) color)))
-
 (defmacro draw-line-base (x0 y0 x1 y1 plot-1 plot-2)
   "Base code for octant 1. Other octants can be gotten from transformations."
   `(do* ((x ,x0 (1+ x))
@@ -81,12 +74,6 @@
                  (svref temp2 1))
               (* (svref temp2 0)
                  (svref temp1 1))))))
-
-(defmacro roundify (&rest args)
-  "Rounds each symbol."
-  `(progn
-     ,@(loop for arg in args
-             collect `(setf ,arg (round ,arg)))))
 
 (defmacro sortify ((a b) (c d))
   `(when (> ,b ,d)

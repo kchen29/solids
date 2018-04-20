@@ -1,7 +1,7 @@
 (defsystem "engine"
   :components
   ((:file "utils")
-   (:file "display")
+   (:file "display" :depends-on ("utils"))
    (:file "matrix")
    (:file "edges" :depends-on ("matrix" "utils"))
    (:file "draw" :depends-on ("display" "edges"))
