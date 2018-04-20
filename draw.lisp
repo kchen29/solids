@@ -82,8 +82,15 @@
               (* (svref temp2 0)
                  (svref temp1 1))))))
 
+(defmacro roundify (&rest args)
+  "Rounds each symbol."
+  `(progn
+     ,@(loop for arg in args
+             collect `(setf ,arg (round ,arg)))))
+
 (defun scanline (x0 y0 x1 y1 x2 y2 color)
   "Does scanline conversion."
+  (roundify y0 y1 y2)
   (when (> y0 y1)
     (rotatef y0 y1)
     (rotatef x0 x1))
@@ -93,7 +100,15 @@
   (when (> y0 y2)
     (rotatef y0 y2)
     (rotatef x0 x2))
-  (loop for y from y0 below y1
-        for a = x0 then (+ a (/ (- x2 x0) (- y2 y0)))
-        for b = x0 then (+ b (/ (- x1 x0) (- y1 y0)))
-        do (draw-line a y b y color)))
+  (do ((y y0 (1+ y))
+       (a x0 (+ a (/ (- x2 x0) (- y2 y0))))
+       (b x0)
+       changed)
+      ((>= y y2))
+    (draw-line a y b y color)
+    (cond
+      ((< y y1) (incf b (/ (- x1 x0) (- y1 y0))))
+      (changed (incf b (/ (- x2 x1) (- y2 y1))))
+      (t (setf b x1
+               changed t)))))
+
