@@ -1,39 +1,41 @@
 ;;;; Draw to screen.
 
-(defmacro draw-line-base (x0 y0 x1 y1 plot-1 plot-2)
+(defmacro draw-line-base (x0 y0 z0 x1 y1 z1 plot-1 plot-2)
   "Base code for octant 1. Other octants can be gotten from transformations."
   `(do* ((x ,x0 (1+ x))
          (y ,y0)
+         (z ,z0 (+ z (/ (- ,z1 ,z0) (- ,x1 ,x0))))
          (A (- ,y1 ,y0))
          (B (- ,x0 ,x1))
          (2A (* 2 A))
          (2B (* 2 B))
          (d (+ 2A B) (+ d 2A)))
-        ((> x ,x1))
-     (plot ,plot-1 ,plot-2 color)
+        ((>= x ,x1))
+     (plot ,plot-1 ,plot-2 z color)
      (when (> d 0)
        (incf y)
        (incf d 2B))))
 
-(defun draw-line (x0 y0 x1 y1 color)
+(defun draw-line (x0 y0 z0 x1 y1 z1 color)
   "Draws a line from (x0, y0) to (x1, y1) on *SCREEN* using COLOR."
-  (sortify 0 (x0 y0) (x1 y1))
+  (floorify x0 y0 x1 y1)
+  (sortify 0 (x0 y0 z0) (x1 y1 z1))
   (let ((xdif (- x1 x0))
         (ydif (- y1 y0)))
     (if (>= ydif 0)
         (if (minusp (- ydif xdif))
-            (draw-line-base x0 y0 x1 y1 x y)
-            (draw-line-base y0 x0 y1 x1 y x))
+            (draw-line-base x0 y0 z0 x1 y1 z1 x y)
+            (draw-line-base y0 x0 z0 y1 x1 z1 y x))
         (if (minusp (+ ydif xdif))
-            (draw-line-base y0 x0 (- y0 ydif) x1 y (- (* 2 y0) x))
-            (draw-line-base x0 y0 x1 (- y0 ydif) x (- (* 2 y0) y))))))
+            (draw-line-base y0 x0 z0 (- y0 ydif) x1 z1 y (- (* 2 y0) x))
+            (draw-line-base x0 y0 z0 x1 (- y0 ydif) z1 x (- (* 2 y0) y))))))
 
 (defun draw-line-index (edges index color)
   "Draws the line starting from INDEX in EDGES."
   (macrolet-helper
     (let (forms)
       (dotimes (in 2)
-        (dotimes (co 2)
+        (dotimes (co 3)
           (push `(mref edges ,co (+ ,in index)) forms)))
       `(draw-line ,@(nreverse forms) color))))
 
@@ -43,22 +45,23 @@
     (draw-line-index edges index color)))
 
 ;;;3d shapes
-(defun draw-polygon (x0 y0 x1 y1 x2 y2)
+(defun draw-polygon (x0 y0 z0 x1 y1 z1 x2 y2 z2)
   "Draws the polygon to *SCREEN*."
-  (let ((color (mapcar (lambda (x y) (mod (round (* x y)) 256))
-                       (list x0 x1 x2)
-                       (list y0 y1 y2))))
-    (draw-line x0 y0 x1 y1 color)
-    (draw-line x0 y0 x2 y2 color)
-    (draw-line x1 y1 x2 y2 color)
-    (scanline x0 y0 x1 y1 x2 y2 color)))
+  (let ((color (mapcar (lambda (a b c) (mod (round (* a b c)) 256))
+                       (list x0 y0 z0)
+                       (list x1 y1 z1)
+                       (list x2 y2 z2))))
+    (draw-line x0 y0 z0 x1 y1 z1 color)
+    (draw-line x0 y0 z0 x2 y2 z2 color)
+    (draw-line x1 y1 z1 x2 y2 z2 color)
+    (scanline x0 y0 z0 x1 y1 z1 x2 y2 z2 color)))
 
 (defun draw-polygon-index (polygons index)
   "Draws the polygon starting from INDEX in POLYGONS"
   (macrolet-helper
     (let (forms)
       (dotimes (in 3)
-        (dotimes (co 2)
+        (dotimes (co 3)
           (push `(mref polygons ,co (+ ,in index)) forms)))
       `(draw-polygon ,@(nreverse forms)))))
 
@@ -84,19 +87,23 @@
               (* (svref temp2 0)
                  (svref temp1 1))))))
 
-(defun scanline (x0 y0 x1 y1 x2 y2 color)
+(defun scanline (x0 y0 z0 x1 y1 z1 x2 y2 z2 color)
   "Does scanline conversion."
-  (roundify y0 y1 y2)
+  (floorify y0 y1 y2)
   ;;have y0 be the bottom, y1 the middle, and y2 the top
-  (sortify 1 (x0 y0) (x1 y1) (x2 y2))
+  (sortify 1 (x0 y0 z0) (x1 y1 z1) (x2 y2 z2))
   (do ((y y0 (1+ y))
        (a x0 (+ a (/ (- x2 x0) (- y2 y0))))
        (b x0)
+       (c z0 (+ c (/ (- z2 z0) (- y2 y0))))
+       (d z0)
        changed)
       ((>= y y2))
-    (draw-line a y b y color)
+    (draw-line a y c b y d color)
     (cond
-      ((< y y1) (incf b (/ (- x1 x0) (- y1 y0))))
-      (changed (incf b (/ (- x2 x1) (- y2 y1))))
+      ((< y y1) (incf b (/ (- x1 x0) (- y1 y0))) (incf d (/ (- z1 z0) (- y1 y0))))
+      (changed (incf b (/ (- x2 x1) (- y2 y1)))
+               (incf d (/ (- z2 z1) (- y2 y1))))
       (t (setf b x1
+               d z1
                changed t)))))

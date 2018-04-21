@@ -33,11 +33,11 @@
         for product = 1 then (* x product)
         sum (* coeff product)))
 
-(defmacro roundify (&rest args)
-  "Rounds each symbol."
+(defmacro floorify (&rest args)
+  "Floors each symbol."
   `(setf ,@(loop for arg in args
                  collect arg
-                 collect `(round ,arg))))
+                 collect `(floor ,arg))))
 
 (defmacro sortify (index &rest cases)
   "Sorts each case via when and rotatef. Checks the symbol at INDEX.
@@ -59,3 +59,8 @@
   (let ((temp (gensym)))
     `(macrolet ((,temp () ,@body))
        (,temp))))
+
+(defun ffloor-to (number decimals)
+  "Floors NUMBER to DECIMALS places."
+  (/ (ffloor (* number (expt 10 decimals)))
+     (expt 10 decimals)))

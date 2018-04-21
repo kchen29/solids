@@ -5,15 +5,21 @@
 
 (defun make-screen ()
   (make-array *screen-dimensions* :initial-element '(0 0 0)))
+(defun make-z-buffer ()
+  (make-array *screen-dimensions* :initial-element most-negative-double-float))
 
 (defparameter *screen* (make-screen) "A 2D array of colors.")
+(defparameter *z-buffer* (make-z-buffer))
 
-(defun plot (x y color)
-  "Plots (x, y) on *SCREEN* with COLOR.
-   Rounds x and y. Checks bounds. COLOR is not copied."
-  (roundify x y)
-  (when (and (< -1 x *screen-side*) (< -1 y *screen-side*))
-    (setf (aref *screen* x y) color)))
+(defun plot (x y z color)
+  "Plots (x, y) on *SCREEN* with COLOR. Checks bounds.
+   COLOR is not copied. Checks the z-value with *z-buffer*."
+  ;;round to 3 decimal places
+  (setf z (ffloor-to z 3))
+  (when (and (< -1 x *screen-side*) (< -1 y *screen-side*)
+             (> z (aref *z-buffer* x y)))
+    (setf (aref *screen* x y) color
+          (aref *z-buffer* x y) z)))
 
 (defun write-ppm (filename)
   "Writes a ppm, assuming P3 and max color value of 255.
@@ -44,10 +50,12 @@
                    :wait nil :search t)))
 
 (defun clear-screen ()
-  "Clears *SCREEN*. Sets all the pixels to black."
+  "Clears *SCREEN*. Sets all the pixels to black.
+   Clears *Z-BUFFER*. Sets all the values to the least float."
   (dotimes (x *screen-side*)
     (dotimes (y *screen-side*)
-      (setf (aref *screen* x y) '(0 0 0)))))
+      (setf (aref *screen* x y) '(0 0 0)
+            (aref *z-buffer* x y) most-negative-double-float))))
 
 (defun display (&optional (wait nil))
   "Displays the image with *SCREEN*.
