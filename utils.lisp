@@ -64,3 +64,7 @@
   "Rounds NUMBER to DECIMALS places."
   (/ (fround (* number (expt 10 decimals)))
      (expt 10 decimals)))
+
+(defun diff-quot (a b c d)
+  "Calculates the difference quotient of A minus B divided by C minus D."
+  (/ (- a b) (- c d)))

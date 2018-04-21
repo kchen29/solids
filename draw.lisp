@@ -4,7 +4,7 @@
   "Base code for octant 1. Other octants can be gotten from transformations."
   `(do* ((x ,x0 (1+ x))
          (y ,y0)
-         (z ,z0 (+ z (/ (- ,z1 ,z0) (- ,x1 ,x0))))
+         (z ,z0 (+ z (diff-quot ,z1 ,z0 ,x1 ,x0)))
          (A (- ,y1 ,y0))
          (B (- ,x0 ,x1))
          (2A (* 2 A))
@@ -94,13 +94,13 @@
   ;;have y0 be the bottom, y1 the middle, and y2 the top
   (sortify 1 (x0 y0 z0) (x1 y1 z1) (x2 y2 z2))
   (do ((y y0 (1+ y))
-       (a x0 (+ a (/ (- x2 x0) (- y2 y0))))
+       (a x0 (+ a (diff-quot x2 x0 y2 y0)))
        (b x0)
-       (c z0 (+ c (/ (- z2 z0) (- y2 y0))))
+       (c z0 (+ c (diff-quot z2 z0 y2 z0)))
        (d z0))
       ((>= y y2))
     (cond
-      ((< y0 y y1) (incf b (/ (- x1 x0) (- y1 y0))) (incf d (/ (- z1 z0) (- y1 y0))))
-      ((< y1 y y2) (incf b (/ (- x2 x1) (- y2 y1))) (incf d (/ (- z2 z1) (- y2 y1))))
+      ((< y0 y y1) (incf b (diff-quot x1 x0 y1 y0)) (incf d (diff-quot z1 z0 y1 y0)))
+      ((< y1 y y2) (incf b (diff-quot x2 x1 y2 y1)) (incf d (diff-quot z2 z1 y2 y1)))
       ((= y y1) (setf b x1 d z1)))
     (draw-line a y c b y d color)))
