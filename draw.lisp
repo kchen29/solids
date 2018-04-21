@@ -97,14 +97,10 @@
        (a x0 (+ a (/ (- x2 x0) (- y2 y0))))
        (b x0)
        (c z0 (+ c (/ (- z2 z0) (- y2 y0))))
-       (d z0)
-       changed)
+       (d z0))
       ((>= y y2))
-    (draw-line a y c b y d color)
     (cond
-      ((< y (1- y1)) (incf b (/ (- x1 x0) (- y1 y0))) (incf d (/ (- z1 z0) (- y1 y0))))
-      (changed (incf b (/ (- x2 x1) (- y2 y1)))
-               (incf d (/ (- z2 z1) (- y2 y1))))
-      (t (setf b x1
-               d z1
-               changed t)))))
+      ((< y0 y y1) (incf b (/ (- x1 x0) (- y1 y0))) (incf d (/ (- z1 z0) (- y1 y0))))
+      ((< y1 y y2) (incf b (/ (- x2 x1) (- y2 y1))) (incf d (/ (- z2 z1) (- y2 y1))))
+      ((= y y1) (setf b x1 d z1)))
+    (draw-line a y c b y d color)))
