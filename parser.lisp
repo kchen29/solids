@@ -85,9 +85,9 @@
       
       ("box" (apply #'add-box polygons args)
              (post-add-polygons))
-      ("sphere" (apply #'add-sphere polygons 20 args)
+      ("sphere" (apply #'add-sphere polygons 10 args)
                 (post-add-polygons))
-      ("torus" (apply #'add-torus polygons 20 args)
+      ("torus" (apply #'add-torus polygons 10 args)
                (post-add-polygons))
       
       ("scale" (update-current-stack (apply #'make-scale args)))

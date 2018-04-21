@@ -15,7 +15,7 @@
   "Plots (x, y) on *SCREEN* with COLOR. Checks bounds.
    COLOR is not copied. Checks the z-value with *z-buffer*."
   ;;round to 3 decimal places
-  (setf z (ffloor-to z 3))
+  (setf z (fround-to z 3))
   (when (and (< -1 x *screen-side*) (< -1 y *screen-side*)
              (> z (aref *z-buffer* x y)))
     (setf (aref *screen* x y) color

@@ -18,8 +18,9 @@
 
 (defun draw-line (x0 y0 z0 x1 y1 z1 color)
   "Draws a line from (x0, y0) to (x1, y1) on *SCREEN* using COLOR."
-  (floorify x0 y0 x1 y1)
+  (roundify x0 y0 x1 y1)
   (sortify 0 (x0 y0 z0) (x1 y1 z1))
+  (plot x1 y1 z1 color)
   (let ((xdif (- x1 x0))
         (ydif (- y1 y0)))
     (if (>= ydif 0)
@@ -89,7 +90,7 @@
 
 (defun scanline (x0 y0 z0 x1 y1 z1 x2 y2 z2 color)
   "Does scanline conversion."
-  (floorify y0 y1 y2)
+  (roundify y0 y1 y2)
   ;;have y0 be the bottom, y1 the middle, and y2 the top
   (sortify 1 (x0 y0 z0) (x1 y1 z1) (x2 y2 z2))
   (do ((y y0 (1+ y))
@@ -101,7 +102,7 @@
       ((>= y y2))
     (draw-line a y c b y d color)
     (cond
-      ((< y y1) (incf b (/ (- x1 x0) (- y1 y0))) (incf d (/ (- z1 z0) (- y1 y0))))
+      ((< y (1- y1)) (incf b (/ (- x1 x0) (- y1 y0))) (incf d (/ (- z1 z0) (- y1 y0))))
       (changed (incf b (/ (- x2 x1) (- y2 y1)))
                (incf d (/ (- z2 z1) (- y2 y1))))
       (t (setf b x1
