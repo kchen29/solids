@@ -26,11 +26,6 @@
     (setf (m-array copy) (copy-array (m-array copy)))
     copy))
 
-(defun copy-array (array)
-  "Copies an array."
-  (let ((dims (array-dimensions array)))
-    (adjust-array (make-array dims :displaced-to array) dims)))
-
 ;;other matrix functions
 (defun adjust-matrix (matrix rows cols)
   "Adjusts MATRIX to ROWS and COLS.

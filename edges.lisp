@@ -87,11 +87,11 @@
   "Adds a quadrilateral to POLYGONS, with indices.
    Indices into points."
   (macrolet-helper
-    (let (forms)
-      (dolist (x '(i j k l))
-        (dotimes (y 3)
-          (push `(mref points ,y ,x) forms)))
-      `(add-quad polygons ,@(nreverse forms)))))
+    `(add-quad polygons
+               ,@(collect-to forms
+                   (dolist (x '(i j k l))
+                     (dotimes (y 3)
+                       (collect `(mref points ,y ,x))))))))
 
 (defun add-box (polygons x y z width height depth)
   "Adds a box to POLYGONS where the front left upper point is (x y z).
