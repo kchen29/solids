@@ -10,7 +10,7 @@
          (2A (* 2 A))
          (2B (* 2 B))
          (d (+ 2A B) (+ d 2A)))
-        ((>= x ,x1))
+        ((>= x ,x1) (plot x1 y1 z1 color))
      (plot ,plot-1 ,plot-2 z color)
      (when (> d 0)
        (incf y)
@@ -20,7 +20,6 @@
   "Draws a line from (x0, y0) to (x1, y1) on *SCREEN* using COLOR."
   (roundify x0 y0 x1 y1)
   (sortify 0 (x0 y0 z0) (x1 y1 z1))
-  (plot x1 y1 z1 color)
   (let ((xdif (- x1 x0))
         (ydif (- y1 y0)))
     (if (>= ydif 0)
@@ -97,7 +96,7 @@
   (do ((y y0 (1+ y))
        (a x0 (+ a (diff-quot x2 x0 y2 y0)))
        (b x0)
-       (c z0 (+ c (diff-quot z2 z0 y2 z0)))
+       (c z0 (+ c (diff-quot z2 z0 y2 y0)))
        (d z0))
       ((>= y y2))
     (cond

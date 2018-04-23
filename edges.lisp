@@ -144,7 +144,7 @@
     (do-step-max (phi step (* 2 pi))
       (do-step-max (theta step (* 2 pi))
         (add-point points (+ x (* (cos phi) (+ r2 (* r1 (cos theta)))))
-                   (- y (* r1 (sin theta)))
+                   (+ y (* r1 (sin theta)))
                    (- z (* (sin phi) (+ r2 (* r1 (cos theta))))))))
     points))
 
