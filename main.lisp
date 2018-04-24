@@ -1,6 +1,3 @@
 (defun main (filename)
-  "Sets up then parses FILENAME. See parser.lisp."
-  (let ((edges (make-matrix))
-        (polygons (make-matrix))
-        (stack (list (make-transform-matrix))))
-    (parse-file filename edges polygons stack)))
+  "Sets up for parsing FILENAME. See parser.lisp."
+  (parse-file filename (make-matrix) (make-matrix) (list (make-transform-matrix))))

@@ -1,6 +1,7 @@
 ;;;; Matrices and transformations.
 
 ;;matrix struct definition
+;;somewhat hacky
 (defstruct (matrix (:conc-name m-)
                    (:constructor m-matrix)
                    (:copier m-copy-matrix)
@@ -8,7 +9,7 @@
   rows
   cols
   ;;last-col is how many columns there are
-  (last-col 0)
+  last-col
   array)
 
 (defmacro mref (matrix x y)
@@ -51,7 +52,7 @@
 
 ;;identity, and multiply
 (defun to-identity (matrix)
-  "Turns MATRIX into an identity matrix. Returns the matrix"
+  "Turns MATRIX into an identity matrix. Returns the matrix."
   (dotimes (x (m-rows matrix))
     (dotimes (y (m-last-col matrix))
       (if (= x y)
@@ -82,8 +83,8 @@
   (to-identity (make-matrix :last-col 4)))
 
 (defmacro deftransform (transform-name args &body body)
-  "Defuns make-transform given TRANSFORM-NAME, using args and the body.
-   Requires docstring as part of body.
+  "Defuns make-transform given TRANSFORM-NAME, using ARGS and BODY.
+   Requires docstring as part of BODY.
    Also defuns transform, applying make-transform to another matrix."
   (let ((make-symbol (concat-symbol "MAKE-" transform-name)))
     `(progn
@@ -92,7 +93,7 @@
          (let ((transform (make-transform-matrix)))
            ,@body
            transform))
-       (defun ,transform-name ,(cons 'matrix args)
+       (defun ,transform-name (matrix ,@args)
          ,(concat-string "Applies make-" transform-name " to MATRIX.")
          (matrix-multiply (,make-symbol ,@args) matrix)))))
 

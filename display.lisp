@@ -1,15 +1,16 @@
 ;;;; Interacting with screens. Primarily interfacing to the outside.
 
-(defparameter *screen-side* 500)
-(defparameter *screen-dimensions* (list *screen-side* *screen-side*))
+(defparameter *screen-side* 0)
+(defparameter *screen* 0)
+(defparameter *z-buffer* 0)
 
-(defun make-screen ()
-  (make-array *screen-dimensions* :initial-element '(0 0 0)))
-(defun make-z-buffer ()
-  (make-array *screen-dimensions* :initial-element most-negative-double-float))
+(defun make-screen (side)
+  (setf *screen-side* side)
+  (let ((dimensions (list side side)))
+    (setf *screen* (make-array dimensions :initial-element '(0 0 0)))
+    (setf *z-buffer* (make-array dimensions :initial-element most-negative-double-float))))
 
-(defparameter *screen* (make-screen) "A 2D array of colors.")
-(defparameter *z-buffer* (make-z-buffer))
+(make-screen 500)
 
 (defun plot (x y z color)
   "Plots (x, y) on *SCREEN* with COLOR. Checks bounds.
