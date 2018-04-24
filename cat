@@ -12,17 +12,17 @@ scale
 sphere
 0 0 0 62
 pop
-#neck 139 161
+#neck 139 163
 push
 move
--91 26 0
+-91 28 0
 push
 scale
-1.34 1 1.3
+1.6 1 1.3
 sphere
 0 0 0 48
 pop
-#head 66 171
+#head 66 173
 push
 move
 -73 10 0
@@ -32,28 +32,54 @@ scale
 sphere
 0 0 0 50
 pop
-pop
-pop
-#tail 360 177
+#muzzle 45 130
 push
 move
-130 42 0
-push
-scale
-7.26 1 1
-sphere
-0 0 0 15
-pop
-#tail2 470 185
-push
-move
-110 8 0
+-21 -43 0
 rotate
-z 35
+z -25
 scale
-2.1 1 1
+2 1 1
 sphere
 0 0 0 10
+pop
+#ears 
+#not religious, but god help me
+pop
+pop
+#tail1 348 175
+push
+move
+118 40 0
+push
+scale
+4.6 1 1
+sphere
+0 0 0 14
+pop
+#tail2 413 176
+push
+move
+65 1 0
+push
+rotate
+z 6
+scale
+3.37 1 1
+sphere
+0 0 0 11
+pop
+#tail3 459 187
+push
+move
+46 12 0
+rotate
+z 28
+scale
+3.4 1 1
+sphere
+0 0 0 8
+pop
 pop
 pop
 #left arm 145 143
@@ -66,7 +92,7 @@ scale
 sphere
 0 0 0 16
 pop
-#left hand 100 120
+#left paw 100 120
 push
 move
 -45 -25 0
@@ -90,7 +116,7 @@ scale
 sphere
 0 0 0 18
 pop
-#right hand 72 73
+#right paw 72 73
 push
 move
 -33 -23 0
@@ -105,7 +131,7 @@ pop
 #left leg 368 92
 push
 move
-138 -43 5
+138 -43 30
 push
 rotate
 z -22
@@ -129,7 +155,7 @@ pop
 #right leg 359 76
 push
 move
-129 -59 -5
+129 -59 -30
 push
 rotate
 z -22
@@ -138,12 +164,12 @@ scale
 sphere
 0 0 0 22
 pop
-#right foot 437 54
+#right foot 428 38
 push
 move
 69 -38 0
 rotate
-z 42
+z 41
 scale
 1 3.75 1
 sphere
