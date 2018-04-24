@@ -85,20 +85,15 @@
   "Defuns make-transform given TRANSFORM-NAME, using args and the body.
    Requires docstring as part of body.
    Also defuns transform, applying make-transform to another matrix."
-  (let* ((transform-string (symbol-name transform-name))
-         (lower-transform-string (string-downcase transform-string))
-         (make-symbol (intern (concatenate 'string "MAKE-" transform-string)))
-         (make-doc (concatenate 'string "Makes a matrix that " (pop body)))
-         (transform-doc (concatenate 'string "Applies make-"
-                                     lower-transform-string " to MATRIX")))
+  (let ((make-symbol (concat-symbol "MAKE-" transform-name)))
     `(progn
        (defun ,make-symbol ,args
-         ,make-doc
+         ,(concatenate 'string "Makes a matrix that " (pop body))
          (let ((transform (make-transform-matrix)))
            ,@body
            transform))
        (defun ,transform-name ,(cons 'matrix args)
-         ,transform-doc
+         ,(concat-string "Applies make-" transform-name " to MATRIX.")
          (matrix-multiply (,make-symbol ,@args) matrix)))))
 
 (deftransform translate (delx dely delz)
@@ -116,19 +111,14 @@
 (defmacro defrotation (rotate-axis axis-0 axis-1)
   "Defines a rotation around ROTATE-AXIS. AXIS-0 and AXIS-1 mark the value of the axes,
    where x corresponds to 0, y 1, and z 2. Rotates from AXIS-0 to AXIS-1."
-  (let* ((axis-string (symbol-name rotate-axis))
-         (lower-axis-string (string-downcase axis-string))
-         (rotate-symbol (intern (concatenate 'string "ROTATE-" axis-string)))
-         (rotate-docstring
-           (concatenate 'string "rotates by DEGREES counter-clockwise using "
-                        lower-axis-string " as the axis.")))
-    `(deftransform ,rotate-symbol (degrees)
-       ,rotate-docstring
-       (let ((radians (/ (* degrees pi) 180)))
-         (setf (mref transform ,axis-0 ,axis-0) (cos radians)
-               (mref transform ,axis-0 ,axis-1) (- 0 (sin radians))
-               (mref transform ,axis-1 ,axis-0) (sin radians)
-               (mref transform ,axis-1 ,axis-1) (cos radians))))))
+  `(deftransform ,(concat-symbol "ROTATE-" rotate-axis) (degrees)
+     ,(concat-string "rotates by DEGREES counter-clockwise using "
+                     rotate-axis " as the axis.")
+     (let ((radians (/ (* degrees pi) 180)))
+       (setf (mref transform ,axis-0 ,axis-0) (cos radians)
+             (mref transform ,axis-0 ,axis-1) (- 0 (sin radians))
+             (mref transform ,axis-1 ,axis-0) (sin radians)
+             (mref transform ,axis-1 ,axis-1) (cos radians)))))
 
 (defrotation z 0 1)
 (defrotation x 1 2)

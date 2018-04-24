@@ -91,3 +91,17 @@
   "Copies an array."
   (let ((dims (array-dimensions array)))
     (adjust-array (make-array dims :displaced-to array) dims)))
+
+(defun concat-symbol (&rest args)
+  "Takes symbols and strings to form a new symbol."
+  (intern (apply #'concatenate 'string
+                 (mapcar (lambda (x) (string-upcase (string x))) args))))
+
+(defun concat-string (&rest args)
+  "Takes symbols and strings to form a string."
+  (apply #'concatenate 'string
+         (mapcar (lambda (x)
+                   (if (symbolp x)
+                       (string-downcase (string x))
+                       x))
+                 args)))
