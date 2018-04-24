@@ -1,0 +1,155 @@
+#offset world
+push
+move
+0 135 0
+#body 230 135
+push
+move
+230 135 0
+push
+scale
+2 1 1
+sphere
+0 0 0 62
+pop
+#neck 139 161
+push
+move
+-91 26 0
+push
+scale
+1.34 1 1.3
+sphere
+0 0 0 48
+pop
+#head 66 171
+push
+move
+-73 10 0
+push
+scale
+1 1 1.24
+sphere
+0 0 0 50
+pop
+pop
+pop
+#tail 360 177
+push
+move
+130 42 0
+push
+scale
+7.26 1 1
+sphere
+0 0 0 15
+pop
+#tail2 470 185
+push
+move
+110 8 0
+rotate
+z 35
+scale
+2.1 1 1
+sphere
+0 0 0 10
+pop
+pop
+#left arm 145 143
+push
+move
+-85 8 62
+push
+scale
+3 1 1
+sphere
+0 0 0 16
+pop
+#left hand 100 120
+push
+move
+-45 -25 0
+rotate
+z -20
+scale
+1 2.26 1
+sphere
+0 0 0 14
+pop
+pop
+#right arm 105 96
+push
+move
+-125 -39 -62
+push
+rotate
+z 13
+scale
+2.4 1 1
+sphere
+0 0 0 18
+pop
+#right hand 72 73
+push
+move
+-33 -23 0
+rotate
+z 15
+scale
+1 2.1 1
+sphere
+0 0 0 14
+pop
+pop
+#left leg 368 92
+push
+move
+138 -43 5
+push
+rotate
+z -22
+scale
+2.9 1 1
+sphere
+0 0 0 22
+pop
+#left foot 437 54
+push
+move
+69 -38 0
+rotate
+z 42
+scale
+1 3.75 1
+sphere
+0 0 0 14
+pop
+pop
+#right leg 359 76
+push
+move
+129 -59 -5
+push
+rotate
+z -22
+scale
+2.9 1 1
+sphere
+0 0 0 22
+pop
+#right foot 437 54
+push
+move
+69 -38 0
+rotate
+z 42
+scale
+1 3.75 1
+sphere
+0 0 0 14
+pop
+pop
+display
+save
+cat.png
