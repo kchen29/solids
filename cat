@@ -1,3 +1,4 @@
+#here's a fun experiment: rotate it.
 #offset world
 push
 move
@@ -12,39 +13,62 @@ scale
 sphere
 0 0 0 62
 pop
-#neck 139 163
+#neck 135 163
 push
 move
--91 28 0
+-95 28 0
 push
+rotate
+z -5
 scale
-1.6 1 1.3
+1.8 1 1.2
 sphere
 0 0 0 48
 pop
 #head 66 173
 push
 move
--73 10 0
+-69 10 0
 push
 scale
 1 1 1.24
 sphere
 0 0 0 50
 pop
-#muzzle 45 130
+#muzzle 42 127
 push
 move
--21 -43 0
+-24 -47 0
 rotate
 z -25
 scale
-2 1 1
+2 1 3.5
 sphere
 0 0 0 10
 pop
-#ears 
 #not religious, but god help me
+#left ear 53 207
+push
+move
+-13 34 45
+rotate
+z -48
+scale
+2.37 1 1
+sphere
+0 0 0 11
+pop
+#right ear 29 196
+push
+move
+-37 23 -45
+rotate
+z -21
+scale
+2.37 1 1
+sphere
+0 0 0 11
+pop
 pop
 pop
 #tail1 348 175
@@ -52,15 +76,17 @@ push
 move
 118 40 0
 push
+rotate
+z -5
 scale
 4.6 1 1
 sphere
 0 0 0 14
 pop
-#tail2 413 176
+#tail2 413 174
 push
 move
-65 1 0
+65 -1 0
 push
 rotate
 z 6
@@ -69,7 +95,7 @@ scale
 sphere
 0 0 0 11
 pop
-#tail3 459 187
+#tail3 459 185
 push
 move
 46 12 0
@@ -107,7 +133,7 @@ pop
 #right arm 105 96
 push
 move
--125 -39 -62
+-125 -39 -25
 push
 rotate
 z 13
@@ -147,7 +173,7 @@ move
 rotate
 z 42
 scale
-1 3.75 1
+1 4 1
 sphere
 0 0 0 14
 pop
@@ -171,7 +197,7 @@ move
 rotate
 z 41
 scale
-1 3.75 1
+1 4 1
 sphere
 0 0 0 14
 pop
