@@ -88,7 +88,7 @@
    Indices into points."
   (macrolet-helper
     `(add-quad polygons
-               ,@(collect-to forms
+               ,@(collect-to
                    (dolist (x '(i j k l))
                      (dotimes (y 3)
                        (collect `(mref points ,y ,x))))))))

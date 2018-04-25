@@ -8,13 +8,13 @@
     `(macrolet ((,temp () ,@body))
        (,temp))))
 
-(defmacro collect-to (var &body body)
-  "Collects things pushed to VAR. The reverse of VAR is returned.
-   When a collect form is found, it pushes to VAR."
-  `(let (,var)
-     (flet ((collect (obj) (push obj ,var)))
-       ,@body
-       (nreverse ,var))))
+(defmacro collect-to (&body body)
+  "Defines a flet to collect objects. The reverse of the the collected is returned."
+  (let ((var (gensym)))
+    `(let (,var)
+       (flet ((collect (obj) (push obj ,var)))
+         ,@body
+         (nreverse ,var)))))
 
 ;;control constructs
 (defmacro do-step-max ((var step max) &body body)
@@ -63,7 +63,7 @@
   "Sorts each case via when and rotatef. Checks the symbol at INDEX.
    Has the first case be least, and last case be greatest."
   `(progn
-     ,@(collect-to forms
+     ,@(collect-to
          (do-pairwise (case1 case2 cases)
            (collect `(when (> ,(nth index case1) ,(nth index case2))
                        ,@(loop for x in case1
@@ -105,3 +105,10 @@
                        (string-downcase (string x))
                        x))
                  args)))
+
+(defmacro generate (loops base)
+  "Generates nested loops and collects BASE forms."
+  `(collect-to
+     ,(do ((head `(collect ,base) `(dotimes ,(car forms) ,head))
+           (forms (nreverse loops) (cdr forms)))
+          ((not forms) head))))

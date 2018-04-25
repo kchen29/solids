@@ -34,10 +34,8 @@
   "Draws the line starting from INDEX in EDGES."
   (macrolet-helper
     `(draw-line
-      ,@(collect-to forms
-          (dotimes (in 2)
-            (dotimes (co 3)
-              (collect `(mref edges ,co (+ ,in index))))))
+      ,@(generate ((in 2) (co 3))
+         `(mref edges ,co (+ ,in index)))
       color)))
 
 (defun draw-lines (edges color)
@@ -61,10 +59,8 @@
   "Draws the polygon starting from INDEX in POLYGONS"
   (macrolet-helper
     `(draw-polygon
-      ,@(collect-to forms
-          (dotimes (in 3)
-            (dotimes (co 3)
-              (collect `(mref polygons ,co (+ ,in index)))))))))
+      ,@(generate ((in 3) (co 3))
+          `(mref polygons ,co (+ ,in index))))))
 
 (defun draw-polygons (polygons)
   "Draws the polygons from POLYGONS to *SCREEN*."
