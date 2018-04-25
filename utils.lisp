@@ -8,13 +8,26 @@
     `(macrolet ((,temp () ,@body))
        (,temp))))
 
+;;it's possible to allow the user to choose whether to explicitly name the variable or not
+;;not implemented though
 (defmacro collect-to (&body body)
-  "Defines a flet to collect objects. The reverse of the the collected is returned."
+  "Defines a flet to collect objects. The reverse of the collected is returned."
   (let ((var (gensym)))
     `(let (,var)
        (flet ((collect (obj) (push obj ,var)))
          ,@body
          (nreverse ,var)))))
+
+;;doesn't actually handle multiple bases; it's currently there for aesthetics.
+;;the iteration value for each of the loops should be a list or positive integer
+;;ideally should be a function
+(defmacro generate (loops &body bases)
+  "Generates nested loops and collects BASES forms."
+  `(collect-to
+     ,(do ((head `(collect ,(car bases)) (list (if (listp (cadar forms)) 'dolist 'dotimes)
+                                               (car forms) head))
+           (forms (nreverse loops) (cdr forms)))
+          ((null forms) head))))
 
 ;;control constructs
 (defmacro do-step-max ((var step max) &body body)
@@ -106,9 +119,3 @@
                        x))
                  args)))
 
-(defmacro generate (loops base)
-  "Generates nested loops and collects BASE forms."
-  `(collect-to
-     ,(do ((head `(collect ,base) `(dotimes ,(car forms) ,head))
-           (forms (nreverse loops) (cdr forms)))
-          ((not forms) head))))

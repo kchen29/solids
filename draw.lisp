@@ -35,7 +35,7 @@
   (macrolet-helper
     `(draw-line
       ,@(generate ((in 2) (co 3))
-         `(mref edges ,co (+ ,in index)))
+          `(mref edges ,co (+ ,in index)))
       color)))
 
 (defun draw-lines (edges color)

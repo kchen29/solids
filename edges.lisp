@@ -88,10 +88,8 @@
    Indices into points."
   (macrolet-helper
     `(add-quad polygons
-               ,@(collect-to
-                   (dolist (x '(i j k l))
-                     (dotimes (y 3)
-                       (collect `(mref points ,y ,x))))))))
+               ,@(generate ((x '(i j k l)) (y 3))
+                   `(mref points ,y ,x)))))
 
 (defun add-box (polygons x y z width height depth)
   "Adds a box to POLYGONS where the front left upper point is (x y z).
